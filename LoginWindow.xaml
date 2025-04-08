@@ -1,4 +1,4 @@
-﻿<Window x:Class="WpfApp_UsersRegistration.MainWindow"
+﻿<Window x:Class="WpfApp_UsersRegistration.LoginWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -6,24 +6,34 @@
         xmlns:local="clr-namespace:WpfApp_UsersRegistration"
         mc:Ignorable="d"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-        Title="User Login" Height="600" Width="800">
+        Title="User Login" Height="450" Width="700">
+    <Window.Triggers>
+        <EventTrigger RoutedEvent="Loaded">
+            <EventTrigger.Actions>
+                <BeginStoryboard>
+                    <Storyboard TargetProperty="Width" TargetName="loginBtn">
+                        <DoubleAnimation From="450" To="0" AutoReverse="True" RepeatBehavior="2x" Duration="0:0:3"/>
+                    </Storyboard>
+                </BeginStoryboard>
+            </EventTrigger.Actions>
+        </EventTrigger>
+    </Window.Triggers>
     <Grid Background="#ffdadada">
         <Border MinWidth="400" Margin="15" Background="White" VerticalAlignment="Center" Padding="30" MaxWidth="550" CornerRadius="20">
             <Border.Effect>
                 <DropShadowEffect BlurRadius="30" Color="LightGray" ShadowDepth="0"/>
             </Border.Effect>
             <StackPanel>
-                <TextBlock Text="Hello!" FontSize="30" FontWeight="Bold" Margin="0 0 0 20"/>
+                <TextBlock Text="Authorization" FontSize="30" FontWeight="Bold" Margin="0 0 0 20"/>
                 <Grid Margin="0 0 0 20">
-                    <Button HorizontalAlignment="Left" VerticalAlignment="Center" Content="Registration" />
-                    <Button HorizontalAlignment="Right" Content="Login" Click="Button_LoginWindow_Click" Style="{StaticResource MaterialDesignFlatButton}"/>                    
-                </Grid>                
+                    <Button HorizontalAlignment="Left" VerticalAlignment="Center" Click="Button_RegWindow_Click" Content="Registration" />
+                    <Button HorizontalAlignment="Right" Content="Login" Style="{StaticResource MaterialDesignFlatButton}"/>
+                </Grid>
                 <TextBox x:Name="textBoxLogin" materialDesign:HintAssist.Hint="Enter login" Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
                 <PasswordBox x:Name="passwordBox" materialDesign:HintAssist.Hint="Enter password" Style="{StaticResource MaterialDesignFloatingHintPasswordBox}"/>
-                <PasswordBox x:Name="passwordBox2" materialDesign:HintAssist.Hint="Repeate Password" Style="{StaticResource MaterialDesignFloatingHintPasswordBox}"/>
-                <TextBox x:Name="textBoxEmail" materialDesign:HintAssist.Hint="Email" Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
-                <Button x:Name="regBtn" Content="Register" Margin="0 20" Click="Button_Reg_Click"/>
+              
+                <Button x:Name="loginBtn" Content="Login" Margin="0 20" Click="Button_Login_Click"/>
             </StackPanel>
-        </Border> 
+        </Border>
     </Grid>
 </Window>

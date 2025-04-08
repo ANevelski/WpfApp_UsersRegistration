@@ -1,5 +1,10 @@
-﻿using System.Windows;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 
 
 namespace WpfApp_UsersRegistration
@@ -9,19 +14,29 @@ namespace WpfApp_UsersRegistration
     /// </summary>
     public partial class MainWindow : Window
     {
+        AppContext appContext;
+
         public MainWindow()
         {
             InitializeComponent();
+
+            appContext = new AppContext();
+
+            DoubleAnimation btnAnimation = new DoubleAnimation();
+            btnAnimation.From = 0;
+            btnAnimation.To = 450;
+            btnAnimation.Duration = TimeSpan.FromSeconds(3);
+            regBtn.BeginAnimation(Button.WidthProperty, btnAnimation);
         }
 
         private void Button_Reg_Click(object sender, RoutedEventArgs e)
         {
-            string lorin =textBoxLogin.Text.Trim();
+            string login =textBoxLogin.Text.Trim();
             string password = passwordBox.Password.Trim();
             string password2 = passwordBox2.Password.Trim();
             string email = textBoxEmail.Text.Trim().ToLower();
 
-            if(lorin.Length<5)
+            if(login.Length<5)
             {
                 textBoxLogin.ToolTip = "Incorrect login.";
                 textBoxLogin.Background = Brushes.OrangeRed;
@@ -53,9 +68,24 @@ namespace WpfApp_UsersRegistration
                 textBoxEmail.ToolTip = string.Empty;
                 textBoxEmail.Background = Brushes.Transparent;
 
-                MessageBox.Show("Data ia correct!");
-            }
+               
+                User user = new User(login, email, password);
 
+                appContext.Users.Add(user);
+                appContext.SaveChanges();
+
+                MessageBox.Show("Data is correct!");
+                UserDataWindow userDataWindow = new UserDataWindow();
+                userDataWindow.Show();
+                Hide();
+            }
+        }
+
+        private void Button_LoginWindow_Click(object sender, RoutedEventArgs e)
+        {
+            LoginWindow loginWindow = new LoginWindow();
+            loginWindow.Show();
+            Hide();
         }
     }
 }
