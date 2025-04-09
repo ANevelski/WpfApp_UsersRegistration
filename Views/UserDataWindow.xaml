@@ -26,7 +26,7 @@
                                     </Style>
                                 </GridViewColumn.HeaderContainerStyle>
                             </GridViewColumn>
-                            <GridViewColumn Header="Login" DisplayMemberBinding="{Binding Login}" Width="100">
+                            <GridViewColumn Header="Login" DisplayMemberBinding="{Binding Login}" Width="150">
                                 <GridViewColumn.HeaderContainerStyle>
                                     <Style TargetType="GridViewColumnHeader">
                                         <Setter Property="HorizontalContentAlignment" Value="Center"/>
@@ -35,7 +35,7 @@
                                     </Style>
                                 </GridViewColumn.HeaderContainerStyle>
                             </GridViewColumn>
-                            <GridViewColumn Header="Email" DisplayMemberBinding="{Binding Email}" Width="100">
+                            <GridViewColumn Header="Email" DisplayMemberBinding="{Binding Email}" Width="150">
                                 <GridViewColumn.HeaderContainerStyle>
                                     <Style TargetType="GridViewColumnHeader">
                                         <Setter Property="HorizontalContentAlignment" Value="Center"/>
@@ -43,22 +43,8 @@
                                         <Setter Property="Background" Value="LightGray"/>
                                     </Style>
                                 </GridViewColumn.HeaderContainerStyle>
-                            </GridViewColumn>
-                            <GridViewColumn Header="Edit" Width="100">
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <Button Content="Edit" Width="75" Command="{Binding DataContext.EditCommand, RelativeSource={RelativeSource AncestorType=ListView}}" CommandParameter="{Binding}" />
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                                <GridViewColumn.HeaderContainerStyle>
-                                    <Style TargetType="GridViewColumnHeader">
-                                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                                        <Setter Property="FontWeight" Value="Bold"/>
-                                        <Setter Property="Background" Value="LightGray"/>
-                                    </Style>
-                                </GridViewColumn.HeaderContainerStyle>
-                            </GridViewColumn>
-                            <GridViewColumn Header="Delete" Width="100">
+                            </GridViewColumn>                            
+                            <GridViewColumn Header="Delete" Width="110">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
                                         <Button Content="Delete" Width="75" Click="Delete_Button_Click" Tag="{Binding id}" />

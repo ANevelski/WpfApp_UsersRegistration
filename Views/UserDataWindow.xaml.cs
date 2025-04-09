@@ -22,17 +22,22 @@ namespace WpfApp_UsersRegistration
 
         private void Delete_Button_Click(object sender, RoutedEventArgs e)
         {
-           if (sender is Button button)
-            {
-                // Получаем ID пользователя из Tag
+            if (sender is Button button)
+            {                
                 if (button.Tag is int userId)
-                {
-                    // Вызываем метод удаления
-                    DALService<User>.DeleteFromStorage(userId);                    
-                    listOfUsers.ItemsSource = DALService<User>.GetAll(); ;
+                {             
+                    DALService<User>.DeleteFromStorage(userId);
+                    
+                    var users = listOfUsers.ItemsSource.Cast<User>().ToList();                    
+                    var itemToRemove = users.FirstOrDefault(u => u.id == userId);
+
+                    if (itemToRemove != null)
+                    {
+                        users.Remove(itemToRemove);
+                        listOfUsers.ItemsSource = users;
+                    }
                 }
             }
-
         }
     }
 }
