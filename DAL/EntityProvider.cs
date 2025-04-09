@@ -10,7 +10,8 @@ namespace WpfApp_UsersRegistration.DAL
 {
     public class EntityProvider<T>  where T : class
     {
-        private readonly App_Context _context;
+        private App_Context _context;
+        private static readonly object _lock = new object();
 
         public EntityProvider()
         {
@@ -19,42 +20,64 @@ namespace WpfApp_UsersRegistration.DAL
 
         public List<T>GetAll()
         {
+            InitializeContext();
             return _context.Set<T>().ToList();
         }
 
         public T GetById(int id)
         {
+            InitializeContext();
             return _context.Set<T>().Find(id);
         }
 
         public  List<T> Find(Expression<Func<T, bool>> predicate)
         {
-            return _context.Set<T>().Where(predicate).ToList();
+            InitializeContext();
+            List<T> result = new List<T>();
+            result = _context.Set<T>().Where(predicate).ToList();
+           
+            return result;
         }
 
         public Task Add(T entity)
         {
+            InitializeContext();
             _context.Set<T>().Add(entity);
             return Task.CompletedTask;
         }
 
         public Task Update(T entity)
         {
+            InitializeContext();
             _context.Entry(entity).State = EntityState.Modified;
             return Task.CompletedTask;
         }
 
         public void Delete(int id)
         {
+            InitializeContext();
             var entity = GetById(id);
             if (entity != null)
             {
                 _context.Set<T>().Remove(entity);
+                SaveChanges();
             }
         }
         public void SaveChanges()
         {
+            InitializeContext();
             _context.SaveChanges();
+        }
+
+        private void InitializeContext()
+        {
+            lock (_lock)
+            {
+                if (_context == null)
+                {
+                    _context = new App_Context();
+                }
+            }
         }
     }
 }

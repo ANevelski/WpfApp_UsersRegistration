@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
+using WpfApp_UsersRegistration.DAL;
 using WpfApp_UsersRegistration.DAL.DBconnect_AppContext;
 using WpfApp_UsersRegistration.DAL.UserModel;
 
@@ -14,12 +16,23 @@ namespace WpfApp_UsersRegistration
     {
         public UserDataWindow()
         {
-            InitializeComponent();
+            InitializeComponent();                                            
+            listOfUsers.ItemsSource = DALService<User>.GetAll(); 
+        }
 
-            App_Context db = new App_Context();
-            List<User> users = db.Users.ToList();
+        private void Delete_Button_Click(object sender, RoutedEventArgs e)
+        {
+           if (sender is Button button)
+            {
+                // Получаем ID пользователя из Tag
+                if (button.Tag is int userId)
+                {
+                    // Вызываем метод удаления
+                    DALService<User>.DeleteFromStorage(userId);                    
+                    listOfUsers.ItemsSource = DALService<User>.GetAll(); ;
+                }
+            }
 
-            listOfUsers.ItemsSource = users;
         }
     }
 }

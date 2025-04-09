@@ -1,8 +1,7 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
 using System.Windows;
-using System.Windows.Media;
 using WpfApp_UsersRegistration.BusinessLogic;
-using WpfApp_UsersRegistration.DAL.DBconnect_AppContext;
+using WpfApp_UsersRegistration.DAL;
 using WpfApp_UsersRegistration.DAL.UserModel;
 using WpfApp_UsersRegistration.Views;
 
@@ -26,13 +25,14 @@ namespace WpfApp_UsersRegistration
 
             if (UserDataValidator.AreAllUserDataCorrect(login, password))
             {
-                User loginUser = null;
-                using (App_Context db = new App_Context())
-                {
-                    loginUser = db.Users.Where(u => u.Login == login && u.Password == password).FirstOrDefault();
-                }
 
-                if (loginUser != null)
+                EntityProvider<User> provideDB = DALService<User>.GetStorageProvider();
+
+                List<User> loginUser = new List<User>();
+
+                loginUser = provideDB.Find(u => u.Login == login);
+
+                if(loginUser.Count != 0)
                 {
                     UserDataWindow userDataWindow = new UserDataWindow();
                     userDataWindow.Show();
@@ -40,8 +40,8 @@ namespace WpfApp_UsersRegistration
                 }
                 else
                 {
-                    MessageBox.Show("User was not found.");
-                }
+                    MessageBox.Show("Any Users were not found.");
+                }               
             }
         }
 

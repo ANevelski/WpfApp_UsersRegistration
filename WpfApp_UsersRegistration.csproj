@@ -82,6 +82,7 @@
     </ApplicationDefinition>
     <Compile Include="BusinessLogic\UserDataValidator.cs" />
     <Compile Include="DAL\App_Context.cs" />
+    <Compile Include="DAL\DALService.cs" />
     <Compile Include="DAL\EntityProvider.cs" />
     <Compile Include="Views\Helper.cs" />
     <Compile Include="Views\LoginWindow.xaml.cs">

@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 using System.Windows.Media.Animation;
 using WpfApp_UsersRegistration.BusinessLogic;
-using WpfApp_UsersRegistration.DAL.DBconnect_AppContext;
+using WpfApp_UsersRegistration.DAL;
 using WpfApp_UsersRegistration.DAL.UserModel;
 using WpfApp_UsersRegistration.Views;
 
@@ -16,14 +15,13 @@ namespace WpfApp_UsersRegistration
     /// </summary>
     public partial class MainWindow : Window
     {
-        App_Context appContext;
-
+        
+        
         public MainWindow()
         {
             InitializeComponent();
-
-            appContext = new App_Context();
-
+                        
+            // Animation
             DoubleAnimation btnAnimation = new DoubleAnimation();
             btnAnimation.From = 0;
             btnAnimation.To = 450;
@@ -42,9 +40,7 @@ namespace WpfApp_UsersRegistration
             {
                 User user = new User(login, email, password);
 
-                appContext.Users.Add(user);
-                appContext.SaveChanges();
-                
+                DALService<User>.SaveToStorage(user);                            
 
                 MessageBox.Show("Congratulations. You are registed!");
 
