@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using WpfApp_UsersRegistration.DAL.DBconnect_AppContext;
+using WpfApp_UsersRegistration.DAL.UserModel;
 
 
 namespace WpfApp_UsersRegistration
@@ -14,7 +16,7 @@ namespace WpfApp_UsersRegistration
         {
             InitializeComponent();
 
-            AppContext db = new AppContext();
+            App_Context db = new App_Context();
             List<User> users = db.Users.ToList();
 
             listOfUsers.ItemsSource = users;

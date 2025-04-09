@@ -20,8 +20,7 @@
                             <WrapPanel>
                                 <TextBlock Text="{Binding Login}" FontWeight="Bold"/>
                                 <TextBlock Text=", " />
-                                <TextBlock Text="{Binding Email}"/>
-                               
+                                <TextBlock Text="{Binding Email}"/>                               
                             </WrapPanel>
                         </DataTemplate>
                     </ListView.ItemTemplate>

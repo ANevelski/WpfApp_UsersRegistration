@@ -1,6 +1,10 @@
 ﻿using System.Linq;
 using System.Windows;
 using System.Windows.Media;
+using WpfApp_UsersRegistration.BusinessLogic;
+using WpfApp_UsersRegistration.DAL.DBconnect_AppContext;
+using WpfApp_UsersRegistration.DAL.UserModel;
+using WpfApp_UsersRegistration.Views;
 
 
 namespace WpfApp_UsersRegistration
@@ -19,33 +23,17 @@ namespace WpfApp_UsersRegistration
         {
             string login = textBoxLogin.Text.Trim();
             string password = passwordBox.Password.Trim();
-         
-            if (login.Length < 5)
-            {
-                textBoxLogin.ToolTip = "Incorrect login.";
-                textBoxLogin.Background = Brushes.OrangeRed;
-            }
-            else if (password.Length < 5)
-            {
-                passwordBox.ToolTip = "Incorrect password.";
-                passwordBox.Background = Brushes.OrangeRed;
-            } else
-            {
-                textBoxLogin.ToolTip = string.Empty;
-                textBoxLogin.Background = Brushes.Transparent;
 
-                passwordBox.ToolTip = string.Empty;
-                passwordBox.Background = Brushes.Transparent;
-
+            if (UserDataValidator.AreAllUserDataCorrect(login, password))
+            {
                 User loginUser = null;
-                using (AppContext db = new AppContext())
+                using (App_Context db = new App_Context())
                 {
                     loginUser = db.Users.Where(u => u.Login == login && u.Password == password).FirstOrDefault();
                 }
 
                 if (loginUser != null)
                 {
-                    MessageBox.Show("User was found!");
                     UserDataWindow userDataWindow = new UserDataWindow();
                     userDataWindow.Show();
                     Hide();
@@ -54,7 +42,6 @@ namespace WpfApp_UsersRegistration
                 {
                     MessageBox.Show("User was not found.");
                 }
-                
             }
         }
 
@@ -63,6 +50,23 @@ namespace WpfApp_UsersRegistration
             MainWindow mainWindow = new MainWindow();
             mainWindow.Show();
             Hide();
+        }       
+
+        private void textBoxLogin_LostFocus(object sender, RoutedEventArgs e)
+        {
+            string login = textBoxLogin.Text;
+            if (!UserDataValidator.IsLoginValid(login))
+                Helper.ClearField(textBoxLogin, "Incorrect login. Should be at least 4 characters.");
+            else
+                Helper.RemoveToolTip(sender);
+        }
+        private void passwordBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            string password = passwordBox.Password;
+            if (!UserDataValidator.IsPasswordValid(password))
+                Helper.ClearField(passwordBox, "Incorrect password. It should be at least 5 Latin characters of which one is a capital letter and has at least one number.");
+            else
+                Helper.RemoveToolTip(sender);
         }
     }
 }

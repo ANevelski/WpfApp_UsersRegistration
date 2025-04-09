@@ -29,8 +29,8 @@
                     <Button HorizontalAlignment="Left" VerticalAlignment="Center" Click="Button_RegWindow_Click" Content="Registration" />
                     <Button HorizontalAlignment="Right" Content="Login" Style="{StaticResource MaterialDesignFlatButton}"/>
                 </Grid>
-                <TextBox x:Name="textBoxLogin" materialDesign:HintAssist.Hint="Enter login" Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
-                <PasswordBox x:Name="passwordBox" materialDesign:HintAssist.Hint="Enter password" Style="{StaticResource MaterialDesignFloatingHintPasswordBox}"/>
+                <TextBox x:Name="textBoxLogin" LostFocus="textBoxLogin_LostFocus"  materialDesign:HintAssist.Hint="Enter login" Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
+                <PasswordBox x:Name="passwordBox" LostFocus="passwordBox_LostFocus"  materialDesign:HintAssist.Hint="Enter password" Style="{StaticResource MaterialDesignFloatingHintPasswordBox}"/>
               
                 <Button x:Name="loginBtn" Content="Login" Margin="0 20" Click="Button_Login_Click"/>
             </StackPanel>
