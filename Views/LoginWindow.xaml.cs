@@ -16,6 +16,7 @@ namespace WpfApp_UsersRegistration
         public LoginWindow()
         {
             InitializeComponent();
+            this.Closed += LoginWindow_Closed;
         }
 
         private void Button_Login_Click(object sender, RoutedEventArgs e)
@@ -67,6 +68,11 @@ namespace WpfApp_UsersRegistration
                 Helper.ClearField(passwordBox, "Incorrect password. It should be at least 5 Latin characters of which one is a capital letter and has at least one number.");
             else
                 Helper.RemoveToolTip(sender);
+        }
+
+        private void LoginWindow_Closed(object sender, System.EventArgs e)
+        {
+            Application.Current.Shutdown();
         }
     }
 }

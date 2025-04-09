@@ -20,7 +20,7 @@ namespace WpfApp_UsersRegistration
         public MainWindow()
         {
             InitializeComponent();
-                        
+
             // Animation
             DoubleAnimation btnAnimation = new DoubleAnimation();
             btnAnimation.From = 0;

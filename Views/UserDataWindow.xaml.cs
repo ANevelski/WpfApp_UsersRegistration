@@ -16,7 +16,9 @@ namespace WpfApp_UsersRegistration
     {
         public UserDataWindow()
         {
-            InitializeComponent();                                            
+            InitializeComponent();
+            this.Closed += UserDataWindow_Closed;
+
             listOfUsers.ItemsSource = DALService<User>.GetAll(); 
         }
 
@@ -38,6 +40,11 @@ namespace WpfApp_UsersRegistration
                     }
                 }
             }
+        }
+
+        private void UserDataWindow_Closed(object sender, System.EventArgs e)
+        {
+            Application.Current.Shutdown();
         }
     }
 }
