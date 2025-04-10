@@ -26,7 +26,7 @@ namespace WpfApp_UsersRegistration
 
         protected override void OnExit(ExitEventArgs e)
         {
-            // Освобождение ресурсов контейнера
+            // Freeing up container resources
             Container.Dispose();
             base.OnExit(e);
         }
