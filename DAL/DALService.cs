@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using WpfApp_UsersRegistration.DAL.UserModel;
 
 
 namespace WpfApp_UsersRegistration.DAL
@@ -15,12 +16,12 @@ namespace WpfApp_UsersRegistration.DAL
         {
             _provider = storageProvider ?? throw new ArgumentNullException(nameof(storageProvider));
         }
-                
+
         public async Task SaveToStorageAsync(T item)
         {
             await _provider.AddAsync(item);
             await _provider.SaveChangesAsync();
-        }          
+        }
 
         public async Task DeleteFromStorageAsync(int id)
         {
@@ -73,6 +74,21 @@ namespace WpfApp_UsersRegistration.DAL
 
             var exists = await _provider.FindAsync(predicate);
             return exists.Any();
+        }
+        public void SaveToFileAllUsers()
+        {
+            var storage = new FileStorageProvider<User>("users.json");
+
+            var allUsers = this.GetAllAsync().Result;
+
+            var users = allUsers.OfType<User>().ToList();
+
+            storage.SaveToFile(users);
+
+            foreach (var user in users)
+            {
+                Console.WriteLine($"ID: {user.id}, Login: {user.Login}, Email: {user.Email}");
+            }            
         }
     }
 }

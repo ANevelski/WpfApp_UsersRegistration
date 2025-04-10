@@ -49,5 +49,10 @@ namespace WpfApp_UsersRegistration
         {
             Application.Current.Shutdown();
         }
+        private void SaveToFile_Button_Click(object sender, RoutedEventArgs e)
+        {
+            _dalService.SaveToFileAllUsers();
+            MessageBox.Show("Data is saved to 'users.json' file");
+        }
     }
 }

@@ -1,70 +1,132 @@
-﻿
-//******************* FOr example of different storage ****************************
+﻿using System.Threading.Tasks;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.Json;
+using System.Linq.Expressions;
 
+namespace WpfApp_UsersRegistration.DAL
+{
+    public class FileStorageProvider<T> : IStorageProvider<T> where T : class
+    {
+        private readonly string _filePath;
 
-//using System;
-//using System.Collections.Generic;
-//using System.IO;
-//using System.Linq.Expressions;
-//using System.Threading.Tasks;
+        public FileStorageProvider(string filePath)
+        {
+            _filePath = filePath ?? throw new ArgumentNullException(nameof(filePath));
+            EnsureFileExists();
+        }
 
-//namespace WpfApp_UsersRegistration.DAL
-//{
-//    public class FileStorageProvider<T> : IStorageProvider<T> where T : class
-//    {
-//        private readonly string _filePath;
+        private void EnsureFileExists()
+        {
+            if (!File.Exists(_filePath))
+            {
+                File.WriteAllText(_filePath, "[]");
+            }
+        }
 
-//        public FileStorageProvider(string filePath)
-//        {
-//            _filePath = filePath ?? throw new ArgumentNullException(nameof(filePath));
-//        }
+        public Task<List<T>> GetAllAsync()
+        {
+            var data = File.ReadAllText(_filePath); 
+            var entities = JsonSerializer.Deserialize<List<T>>(data);
+            return Task.FromResult(entities ?? new List<T>());
+        }
 
-//        public Task<List<T>> GetAllAsync()
-//        {
-//            if (!File.Exists(_filePath))
-//                return Task.FromResult(new List<T>());
+        public Task<T> GetByIdAsync(int id)
+        {
+            var entities = GetAllAsync().Result;
 
-//            var data = File.ReadAllText(_filePath);
-//            var entities = JsonSerializer.Deserialize<List<T>>(data);
-//            return Task.FromResult(entities ?? new List<T>());
-//        }
+            var entity = entities.FirstOrDefault(e =>
+            {
+                var idProperty = e.GetType().GetProperty("id");
+                return idProperty != null && (int)idProperty.GetValue(e) == id;
+            });
 
-//        public Task<T> GetByIdAsync(int id)
-//        {
-//            throw new NotImplementedException(); // Можно реализовать для файлов, используя поиск по ключу
-//        }
+            return Task.FromResult(entity);
+        }
 
-//        public Task<List<T>> FindAsync(Expression<Func<T, bool>> predicate)
-//        {
-//            throw new NotImplementedException(); // Реализация сложных фильтров для файлов может быть специфичной
-//        }
+        public Task<List<T>> FindAsync(Expression<Func<T, bool>> predicate)
+        {
+            var entities = GetAllAsync().Result;
+            return Task.FromResult(entities.AsQueryable().Where(predicate).ToList());
+        }
 
-//        public async Task AddAsync(T entity)
-//        {
-//            var entities = await GetAllAsync();
-//            entities.Add(entity);
-//            await SaveToFileAsync(entities);
-//        }
+        public Task AddAsync(T entity)
+        {
+            var entities = GetAllAsync().Result;
+            entities.Add(entity);
+            SaveToFile(entities); 
+            return Task.CompletedTask;
+        }
 
-//        public async Task UpdateAsync(T entity)
-//        {
-//            throw new NotImplementedException(); // Реализация для обновления данных в файле
-//        }
+        public Task UpdateAsync(T entity)
+        {
+            var entities = GetAllAsync().Result;
 
-//        public async Task DeleteAsync(int id)
-//        {
-//            throw new NotImplementedException(); // Реализация для удаления данных
-//        }
+            var idProperty = entity.GetType().GetProperty("id");
+            if (idProperty == null)
+            {
+                throw new InvalidOperationException("Entity must have an 'id' property to update.");
+            }
 
-//        public async Task SaveChangesAsync()
-//        {
-//            // Метод необязателен для файлов — изменения сохраняются сразу
-//        }
+            var idValue = (int)idProperty.GetValue(entity);
 
-//        private async Task SaveToFileAsync(List<T> entities)
-//        {
-//            var data = JsonSerializer.Serialize(entities);
-//            await File.WriteAllTextAsync(_filePath, data);
-//        }
-//    }
-//}
+            var existingEntity = entities.FirstOrDefault(e =>
+            {
+                var id = e.GetType().GetProperty("id")?.GetValue(e);
+                return id != null && (int)id == idValue;
+            });
+
+            if (existingEntity != null)
+            {
+                entities.Remove(existingEntity);
+                entities.Add(entity);
+                SaveToFile(entities);
+            }
+            else
+            {
+                throw new KeyNotFoundException($"Entity with ID {idValue} was not found.");
+            }
+
+            return Task.CompletedTask;
+        }
+
+        public Task DeleteAsync(int id)
+        {
+            var entities = GetAllAsync().Result;
+
+            var entityToDelete = entities.FirstOrDefault(e =>
+            {
+                var idProperty = e.GetType().GetProperty("id");
+                return idProperty != null && (int)idProperty.GetValue(e) == id;
+            });
+
+            if (entityToDelete != null)
+            {
+                entities.Remove(entityToDelete);
+                SaveToFile(entities); 
+            }
+            else
+            {
+                throw new KeyNotFoundException($"Entity with ID {id} was not found.");
+            }
+
+            return Task.CompletedTask;
+        }
+
+        public void SaveToFile(List<T> entities)
+        {
+            var data = JsonSerializer.Serialize(entities, new JsonSerializerOptions
+            {
+                WriteIndented = true
+            });
+            File.WriteAllText(_filePath, data);
+        }
+
+        public Task SaveChangesAsync()
+        {
+            return Task.CompletedTask;
+        }       
+    }
+}

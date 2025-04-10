@@ -4,7 +4,7 @@ namespace WpfApp_UsersRegistration.DAL.UserModel
     /// <summary>
     /// User data model class
     /// </summary>
-     public class User
+    public class User
     {
         private int _id;
         private string _login, _email, _password;

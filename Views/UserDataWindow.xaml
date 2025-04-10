@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:WpfApp_UsersRegistration"
         mc:Ignorable="d"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-        Title="User Login" Height="350" Width="600"
+        Title="Users" Height="350" Width="600"
         MaxHeight="500">
     <Grid Background="#ffdadada">
         <Border Margin="15" Background="White" VerticalAlignment="Center" Padding="30" MaxWidth="550" CornerRadius="20" BorderBrush="Black">
@@ -15,6 +15,7 @@
             </Border.Effect>
             <StackPanel>
                 <TextBlock Text="Users Data" FontSize="30" FontWeight="Bold" Margin="0 0 0 20"/>
+                <Button Content="Save to file" HorizontalAlignment="Right" Width="107" Click="SaveToFile_Button_Click" Margin="0 0 15 0"/>
                 <ListView x:Name="listOfUsers" Margin="10" BorderThickness="1" ItemsSource="{Binding Users}" MaxHeight="250" ScrollViewer.VerticalScrollBarVisibility="Auto">
                     <ListView.View>
                         <GridView>
