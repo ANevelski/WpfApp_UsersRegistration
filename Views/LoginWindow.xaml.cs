@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Windows;
+﻿using System.Windows;
+using Unity;
 using WpfApp_UsersRegistration.BusinessLogic;
 using WpfApp_UsersRegistration.DAL;
 using WpfApp_UsersRegistration.DAL.UserModel;
@@ -16,24 +16,20 @@ namespace WpfApp_UsersRegistration
         public LoginWindow()
         {
             InitializeComponent();
+
             this.Closed += LoginWindow_Closed;
         }
 
-        private void Button_Login_Click(object sender, RoutedEventArgs e)
+        private async void Button_Login_Click(object sender, RoutedEventArgs e)
         {
             string login = textBoxLogin.Text.Trim();
             string password = passwordBox.Password.Trim();
 
+            var dalService = App.Container.Resolve<DALService<User>>();
+
             if (UserDataValidator.AreAllUserDataCorrect(login, password))
-            {
-
-                EntityProvider<User> provideDB = DALService<User>.GetStorageProvider();
-
-                List<User> loginUser = new List<User>();
-
-                loginUser = provideDB.Find(u => u.Login == login);
-
-                if(loginUser.Count != 0)
+           {               
+                if (await dalService.ExistsAsync(login, password: password))
                 {
                     UserDataWindow userDataWindow = new UserDataWindow();
                     userDataWindow.Show();

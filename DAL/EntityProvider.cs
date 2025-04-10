@@ -8,76 +8,60 @@ using WpfApp_UsersRegistration.DAL.DBconnect_AppContext;
 
 namespace WpfApp_UsersRegistration.DAL
 {
-    public class EntityProvider<T>  where T : class
+    public class EntityProvider<T> : IStorageProvider<T>, IDisposable where T : class
     {
-        private App_Context _context;
-        private static readonly object _lock = new object();
+        private readonly App_Context _context;
 
         public EntityProvider()
         {
             _context = new App_Context();
+        }  
+
+        public async Task<List<T>> GetAllAsync()
+        {
+            return await Task.FromResult(_context.Set<T>().ToList());
         }
 
-        public List<T>GetAll()
+        public async Task<T> GetByIdAsync(int id)
         {
-            InitializeContext();
-            return _context.Set<T>().ToList();
+            return await Task.FromResult(_context.Set<T>().Find(id));
         }
 
-        public T GetById(int id)
+        public async Task<List<T>> FindAsync(Expression<Func<T, bool>> predicate)
         {
-            InitializeContext();
-            return _context.Set<T>().Find(id);
+            return await _context.Set<T>().Where(predicate).ToListAsync();
         }
 
-        public  List<T> Find(Expression<Func<T, bool>> predicate)
+        public async Task AddAsync(T entity)
         {
-            InitializeContext();
-            List<T> result = new List<T>();
-            result = _context.Set<T>().Where(predicate).ToList();
-           
-            return result;
-        }
-
-        public Task Add(T entity)
-        {
-            InitializeContext();
             _context.Set<T>().Add(entity);
-            return Task.CompletedTask;
+            await SaveChangesAsync();
         }
 
-        public Task Update(T entity)
+        public async Task UpdateAsync(T entity)
         {
-            InitializeContext();
             _context.Entry(entity).State = EntityState.Modified;
-            return Task.CompletedTask;
+            await SaveChangesAsync();
         }
 
-        public void Delete(int id)
+        public async Task DeleteAsync(int id)
         {
-            InitializeContext();
-            var entity = GetById(id);
+            var entity = await GetByIdAsync(id);
             if (entity != null)
             {
                 _context.Set<T>().Remove(entity);
-                SaveChanges();
+                await SaveChangesAsync();
             }
-        }
-        public void SaveChanges()
-        {
-            InitializeContext();
-            _context.SaveChanges();
         }
 
-        private void InitializeContext()
+        public async Task SaveChangesAsync()
         {
-            lock (_lock)
-            {
-                if (_context == null)
-                {
-                    _context = new App_Context();
-                }
-            }
+            await _context.SaveChangesAsync();
+        }
+
+        public void Dispose()
+        {
+            _context.Dispose();
         }
     }
 }

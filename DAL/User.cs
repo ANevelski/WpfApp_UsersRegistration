@@ -1,5 +1,4 @@
 ﻿
-
 namespace WpfApp_UsersRegistration.DAL.UserModel
 {
     /// <summary>

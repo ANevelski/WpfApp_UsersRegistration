@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Animation;
+using Unity;
 using WpfApp_UsersRegistration.BusinessLogic;
 using WpfApp_UsersRegistration.DAL;
 using WpfApp_UsersRegistration.DAL.UserModel;
@@ -14,12 +15,10 @@ namespace WpfApp_UsersRegistration
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
-    {
-        
-        
+    {   
         public MainWindow()
         {
-            InitializeComponent();
+            InitializeComponent();        
 
             // Animation
             DoubleAnimation btnAnimation = new DoubleAnimation();
@@ -29,7 +28,7 @@ namespace WpfApp_UsersRegistration
             regBtn.BeginAnimation(Button.WidthProperty, btnAnimation);
         }
 
-        private void Button_Reg_Click(object sender, RoutedEventArgs e)
+        private async void Button_Reg_ClickAsync(object sender, RoutedEventArgs e)
         {
             string login = textBoxLogin.Text.Trim();
             string password = passwordBox.Password.Trim();
@@ -39,14 +38,23 @@ namespace WpfApp_UsersRegistration
             if (UserDataValidator.AreAllUserDataCorrect(login, password, password2, email))
             {
                 User user = new User(login, email, password);
+                                
+                var dalService = App.Container.Resolve<DALService<User>>();
 
-                DALService<User>.SaveToStorage(user);                            
+                if (await dalService.ExistsAsync(login, email: email))
+                {
+                    MessageBox.Show("User with this Login and Email are already registered. Please Modify your data.");
+                }
+                else
+                {
+                    await dalService.SaveToStorageAsync(user);
 
-                MessageBox.Show("Congratulations. You are registed!");
+                    MessageBox.Show("Congratulations. You are registed!");
 
-                UserDataWindow userDataWindow = new UserDataWindow();
-                userDataWindow.Show();
-                Hide();
+                    UserDataWindow userDataWindow = new UserDataWindow();
+                    userDataWindow.Show();
+                    Hide();
+                }
             }
         }
 

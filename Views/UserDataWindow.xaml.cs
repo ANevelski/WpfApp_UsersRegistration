@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using Unity;
 using WpfApp_UsersRegistration.DAL;
-using WpfApp_UsersRegistration.DAL.DBconnect_AppContext;
 using WpfApp_UsersRegistration.DAL.UserModel;
 
 
@@ -14,22 +13,26 @@ namespace WpfApp_UsersRegistration
     /// </summary>
     public partial class UserDataWindow : Window
     {
+        private readonly DALService<User> _dalService;
+
         public UserDataWindow()
         {
             InitializeComponent();
-            this.Closed += UserDataWindow_Closed;
+            _dalService = App.Container.Resolve<DALService<User>>();
 
-            listOfUsers.ItemsSource = DALService<User>.GetAll(); 
+            this.Closed += UserDataWindow_Closed;
+            var users = _dalService.GetAllAsync();
+            listOfUsers.ItemsSource = users.Result;
         }
 
-        private void Delete_Button_Click(object sender, RoutedEventArgs e)
+        private async void Delete_Button_Click(object sender, RoutedEventArgs e)
         {
             if (sender is Button button)
             {                
                 if (button.Tag is int userId)
-                {             
-                    DALService<User>.DeleteFromStorage(userId);
-                    
+                {
+                    await _dalService.DeleteFromStorageAsync(userId);
+
                     var users = listOfUsers.ItemsSource.Cast<User>().ToList();                    
                     var itemToRemove = users.FirstOrDefault(u => u.id == userId);
 

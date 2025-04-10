@@ -1,52 +1,78 @@
-﻿
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
+
 
 namespace WpfApp_UsersRegistration.DAL
 {
-    
-    public static class DALService<T> where T : class
-    {   
-        private static EntityProvider<T> _db;
-             
-        private static readonly object _lock = new object();
+    public class DALService<T> where T : class
+    {
+        private readonly IStorageProvider<T> _provider;
 
-        public static void SaveToStorage(T item)
+        public DALService(IStorageProvider<T> storageProvider)
         {
-            InitializeDb();
-                       
-            _db.Add(item);
-            _db.SaveChanges();
+            _provider = storageProvider ?? throw new ArgumentNullException(nameof(storageProvider));
+        }
+                
+        public async Task SaveToStorageAsync(T item)
+        {
+            await _provider.AddAsync(item);
+            await _provider.SaveChangesAsync();
+        }          
+
+        public async Task DeleteFromStorageAsync(int id)
+        {
+            await _provider.DeleteAsync(id);
         }
 
-        public static void DeleteFromStorage(int id)
+        public async Task<List<T>> GetAllAsync()
         {
-            InitializeDb();                      
-            _db.Delete(id);
+            return await _provider.GetAllAsync();
         }
 
-        public static EntityProvider<T> GetStorageProvider()
+        public async Task<bool> ExistsAsync(string login, string email = null, string password = null)
         {
-            InitializeDb();        
-            return _db;
-        }
+            var parameter = Expression.Parameter(typeof(T), "entity");
+            Expression combinedCondition = null;
 
-        public static List<T> GetAll()
-        {
-            InitializeDb();       
-            return _db.GetAll(); 
-        }
-
-
-        private static void InitializeDb()
-        {
-            lock (_lock)
+            if (!string.IsNullOrEmpty(login))
             {
-                if (_db == null)
-                {
-                    _db = new EntityProvider<T>();
-                }
+                var loginProperty = Expression.Property(parameter, "Login");
+                var loginCondition = Expression.Equal(loginProperty, Expression.Constant(login));
+                combinedCondition = combinedCondition == null
+                    ? loginCondition
+                    : Expression.AndAlso(combinedCondition, loginCondition);
             }
+
+            if (!string.IsNullOrEmpty(email))
+            {
+                var emailProperty = Expression.Property(parameter, "Email");
+                var emailCondition = Expression.Equal(emailProperty, Expression.Constant(email));
+                combinedCondition = combinedCondition == null
+                    ? emailCondition
+                    : Expression.AndAlso(combinedCondition, emailCondition);
+            }
+
+            if (!string.IsNullOrEmpty(password))
+            {
+                var passwordProperty = Expression.Property(parameter, "Password");
+                var passwordCondition = Expression.Equal(passwordProperty, Expression.Constant(password));
+                combinedCondition = combinedCondition == null
+                    ? passwordCondition
+                    : Expression.AndAlso(combinedCondition, passwordCondition);
+            }
+
+            if (combinedCondition == null)
+            {
+                throw new ArgumentException("At least one parameter (login, email, password) must be provided.");
+            }
+
+            var predicate = Expression.Lambda<Func<T, bool>>(combinedCondition, parameter);
+
+            var exists = await _provider.FindAsync(predicate);
+            return exists.Any();
         }
     }
 }

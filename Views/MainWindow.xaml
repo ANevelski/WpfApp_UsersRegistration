@@ -22,7 +22,7 @@
                 <PasswordBox x:Name="passwordBox" LostFocus="passwordBox_LostFocus"  materialDesign:HintAssist.Hint="Enter password" Style="{StaticResource MaterialDesignFloatingHintPasswordBox}"/>
                 <PasswordBox x:Name="passwordBox2" LostFocus="passwordBox2_LostFocus"  materialDesign:HintAssist.Hint="Repeate Password" Style="{StaticResource MaterialDesignFloatingHintPasswordBox}"/>
                 <TextBox x:Name="textBoxEmail" LostFocus="textBoxEmail_LostFocus"  materialDesign:HintAssist.Hint="Email" Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
-                <Button x:Name="regBtn" Content="Register" Margin="0 20" Click="Button_Reg_Click"/>
+                <Button x:Name="regBtn" Content="Register" Margin="0 20" Click="Button_Reg_ClickAsync"/>
             </StackPanel>
         </Border> 
     </Grid>
